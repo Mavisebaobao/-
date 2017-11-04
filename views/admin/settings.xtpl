@@ -1,0 +1,122 @@
+{{extend ("./public")}}
+    {{#block ("body")}}
+            <!-- 个人资料 -->
+            <div class="body center">
+                <div class="settings">
+                    <form action="" class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">头像</label>
+                            <div class="col-xs-2 preview">
+                                {{#if(data.avatar)}}
+                                <img src="{{data.avatar}}">
+                                {{else}}
+                                <img src="./images/default.png">
+                                {{/if}}
+                                <input type="file" id="upfile">
+                                <input type="hidden" name="avatar">
+                                <div class="cover">
+                                    <i class="fa fa-upload"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">用户名</label>
+                            <div class="col-xs-5">
+                                <input type="text" class="form-control input-sm" name="name" value="{{data.name}}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">性别</label>
+                            <div class="col-xs-3">
+                                <label class="radio-inline">
+                                    <input type="radio" {{#if(data.gender === 1)}} checked {{/if}} name="gender" value="0"> 男
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{#if(data.gender === 0)}} checked {{/if}} name="gender" value="0"> 女
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">手机号码</label>
+                            <div class="col-xs-5">
+                                <input type="text" class="form-control input-sm" value="{{data.phone}}" name="phone">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">就职公司</label>
+                            <div class="col-xs-5">
+                                <input type="text" class="form-control input-sm" value="{{data.company}}" name="company">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">个人主页</label>
+                            <div class="col-xs-5">
+                                <input type="text" class="form-control input-sm" value="{{data.homepage}}" name="homepage">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-xs-3 control-label">个性签名</label>
+                            <div class="col-xs-5 ckeditor">
+                                <textarea  rows="5" name="alt" class="form-control input-sm">{{data.alt}}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-8">
+                                <input type="submit" class="btn btn-success btn-sm pull-right" value="保 存">
+                                <a href="/admin/repass" class="btn btn-link btn-sm pull-right">更改密码？</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+      {{/block}}    
+      {{#block ("script")}}
+      <script type="text/javascript">
+            
+            $('form').on('submit', function () {
+                 // 缓存this（form表单）
+                 var _this = $(this);
+
+                 $.ajax({
+                     url: '/admin/updata',
+                     type: 'post',
+                     // 表单数据
+                     data: _this.serialize(),
+                     success: function (info) {
+                         // console.log(info);
+                         if(info.code == 10000) {
+                             alert('更新成功!');
+                         }
+                     }
+                 })
+                return false;
+             });
+
+            $("#upfile").on("change",function(){
+                // alert(10);
+                var data=new FormData;
+
+                //上传的文件的信息
+                data.append('avatar',this.files[0]);
+
+                var xhr=new XMLHttpRequest;
+                xhr.open('post',"/admin/upfile");
+                xhr.send(data);
+
+                xhr.onreadystatechange=function(){
+
+                    if(xhr.readyState==4&&xhr.status==200){
+                        var data=JSON.parse(xhr.responseText);
+                        console.log(data);
+                         // 实现预览效果
+                    $('.preview img').attr('src',"/"+data.path);
+                    // 对数据进行存取
+                    $('input[name="avatar"]').val('/' + data.path);
+                    }
+                }
+            })
+
+      </script>
+            
+      {{/block}}   
+       
